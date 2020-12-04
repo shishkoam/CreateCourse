@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="160dp"
+    android:layout_margin="@dimen/half_margin_bad"
+    card_view:cardBackgroundColor="@color/card_background"
+    card_view:cardCornerRadius="@dimen/card_radius"
+    card_view:cardElevation="@dimen/card_elevation"
+    card_view:contentPadding="@dimen/card_padding">
+
+    <!-- Main Content View -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/photo_image"
+            android:layout_width="140dp"
+            android:layout_height="120dp"
+            android:scaleType="centerCrop"
+            card_view:layout_constraintBottom_toTopOf="@+id/progress_bar"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toTopOf="parent"
+            card_view:layout_constraintVertical_bias="0.48000002" />
+
+<!--        <ImageView-->
+<!--            android:id="@+id/imageViewMask"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="0dp"-->
+<!--            android:scaleType="fitXY"-->
+<!--            android:src="@drawable/mask"-->
+<!--            card_view:layout_constraintBottom_toBottomOf="@+id/photo_image"-->
+<!--            card_view:layout_constraintEnd_toEndOf="@+id/photo_image"-->
+<!--            card_view:layout_constraintStart_toStartOf="@+id/photo_image"-->
+<!--            card_view:layout_constraintTop_toTopOf="@+id/photo_image"-->
+<!--            tools:ignore="ContentDescription" />-->
+
+        <TextView
+            android:paddingStart="@dimen/very_small_margin"
+            android:layout_marginStart="@dimen/half_margin_medium"
+            android:id="@+id/genre_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            tools:text="Description"
+            android:textColor="@color/genre_color"
+            android:textSize="@dimen/text_secondary"
+            card_view:layout_constraintTop_toBottomOf="@id/name_text"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintHorizontal_bias="0"
+            card_view:layout_constraintStart_toEndOf="@id/photo_image"
+            tools:ignore="RtlSymmetry" />
+
+        <ProgressBar
+            android:layout_marginStart="@dimen/half_margin_medium"
+            android:id="@+id/progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:isIndicator="true"
+            tools:progress="80"
+            android:progressTint="@color/md_green_700"
+            card_view:layout_constraintBottom_toBottomOf="parent"
+            card_view:layout_constraintEnd_toStartOf="@id/percent_text"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toBottomOf="@+id/photo_image"
+            tools:ignore="RtlSymmetry" />
+
+        <TextView
+            android:paddingStart="@dimen/very_small_margin"
+            android:id="@+id/name_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
+            android:layout_marginStart="@dimen/half_margin_medium"
+            android:textSize="@dimen/text_primary"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintHorizontal_bias="0.0"
+            card_view:layout_constraintStart_toEndOf="@id/photo_image"
+            card_view:layout_constraintTop_toTopOf="parent"
+            tools:text="Course name"
+            tools:ignore="RtlSymmetry" />
+
+        <TextView
+            android:layout_marginStart="@dimen/card_padding"
+            android:layout_marginEnd="@dimen/main_margin"
+            android:id="@+id/percent_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_third"
+            android:textSize="@dimen/text_secondary"
+            card_view:layout_constraintBottom_toBottomOf="@id/progress_bar"
+            card_view:layout_constraintTop_toTopOf="@id/progress_bar"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintStart_toEndOf="@id/progress_bar"
+            tools:ignore="RtlSymmetry"
+            tools:text="80%" />
+
+        <ImageButton
+            android:id="@+id/likeImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/card_elevation"
+            android:paddingBottom="@dimen/card_elevation"
+            android:paddingEnd="@dimen/card_elevation"
+            android:paddingStart="@dimen/card_elevation"
+            android:background="@android:color/transparent"
+            android:src="@android:drawable/btn_star"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
+
