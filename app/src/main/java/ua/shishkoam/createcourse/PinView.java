@@ -11,6 +11,7 @@ import android.util.AttributeSet;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class PinView extends SubsamplingScaleImageView {
 
@@ -31,6 +32,12 @@ public class PinView extends SubsamplingScaleImageView {
 
     public void setPin(PointF sPin) {
         this.sPin = sPin;
+        initialise();
+        invalidate();
+    }
+
+    public void setAndSavePins(List<PointF> pins) {
+        savedPin.addAll(pins);
         initialise();
         invalidate();
     }

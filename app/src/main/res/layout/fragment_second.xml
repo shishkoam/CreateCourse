@@ -64,8 +64,9 @@
             app:layout_constraintTop_toBottomOf="@id/imageView" />
 
         <EditText
+            android:hint="Введіть найменування об\'єкту"
             android:id="@+id/editText"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintBaseline_toBaselineOf="@id/textview_second"
             app:layout_constraintEnd_toEndOf="parent"

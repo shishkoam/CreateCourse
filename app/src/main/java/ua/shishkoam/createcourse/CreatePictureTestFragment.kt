@@ -3,6 +3,9 @@ package ua.shishkoam.createcourse
 import android.app.Activity
 import android.content.Intent
 import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.PointF
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -11,28 +14,34 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.navArgs
 import com.davemorrissey.labs.subscaleview.ImageSource
 import org.json.JSONArray
 import org.json.JSONObject
 import ua.kblogika.interactive.utils.util.FileUtils.copyFile
+import ua.kblogika.interactive.utils.util.FileUtils.readFromFile
 import ua.kblogika.interactive.utils.util.FileUtils.writeToFile
 import ua.shishkoam.createcourse.ChatUtils.IMAGES_PATH
 import ua.shishkoam.createcourse.ChatUtils.getImageTasksPath
 import java.io.File
+import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
  */
 class CreatePictureTestFragment : Fragment() {
+    private val args: CreatePictureTestFragmentArgs by navArgs()
 
     private val REQUEST_CODE = 121
     var currentItem = 0
-    var uri: Uri? = null
+    var uri: String? = null
     var currentPointOnPicture: PointOnPicture = PointOnPicture()
     private val points: MutableList<PointOnPicture> = ArrayList()
     var imageView: PinView? = null
+    var resultText: TextView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,11 +52,23 @@ class CreatePictureTestFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         val editText = view.findViewById<EditText>(R.id.editText)
         imageView = view.findViewById(R.id.imageView) as PinView
         val textview: TextView = view.findViewById(R.id.textview_second) as TextView
-        val resultText: TextView = view.findViewById(R.id.result) as TextView
+        resultText = view.findViewById(R.id.result) as TextView
+        if (savedInstanceState == null) {
+            val path = args.filePath
+            val file = File(path)
+            if (path.isNotEmpty() && file.exists()) {
+                readPicture(file)
+            }
+        } else {
+            val data = savedInstanceState.getString("data")
+            data?.let {
+                restoreData(data)
+            }
+        }
+
         view.findViewById<Button>(R.id.button_second).setOnClickListener {
             imageView?.savePin()
             points.add(
@@ -64,11 +85,7 @@ class CreatePictureTestFragment : Fragment() {
                 saveImage(it)
                 savePoints()
             }
-            val sb = StringBuilder()
-            for (point in points) {
-                sb.append("${point.name} X= ${point.x} Y = ${point.y}").append("\n")
-            }
-            resultText.text = sb.toString()
+            setResult()
         }
         imageView?.isPanEnabled = true
         imageView?.isZoomEnabled = true
@@ -99,11 +116,20 @@ class CreatePictureTestFragment : Fragment() {
         }
     }
 
+    private fun setResult() {
+        val sb = StringBuilder()
+        for (point in points) {
+            sb.append("${point.name} X= ${point.x} Y = ${point.y}").append("\n")
+        }
+        resultText?.text = sb.toString()
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE) {
-            uri = data?.data
-            uri?.let {
+            val uriResult = data?.data
+            uriResult?.let {
+                uri = getRealPathFromURI(uriResult)
                 saveImage(uri!!)
                 imageView?.setImage(ImageSource.uri(uri!!))
             }
@@ -116,11 +142,11 @@ class CreatePictureTestFragment : Fragment() {
         startActivityForResult(intent, REQUEST_CODE)
     }
 
-    private fun saveImage(tempPhotoUri: Uri) {
+    private fun saveImage(tempPhotoUri: String?) {
         val dir = File(IMAGES_PATH)
         dir.mkdirs()
-        val destinationFile = File(dir, "test img ${tempPhotoUri.lastPathSegment}.jpg")
-        val sourceFile = File(getRealPathFromURI(tempPhotoUri))
+        val sourceFile = File(tempPhotoUri)
+        val destinationFile = File(dir, "test img ${sourceFile.name}.jpg")
         copyFile(sourceFile, destinationFile)
     }
 
@@ -146,7 +172,24 @@ class CreatePictureTestFragment : Fragment() {
         return result ?: ""
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("data", createJson().toString())
+    }
+
     private fun savePoints() {
+        val json = createJson()
+        val sdf = SimpleDateFormat("yyyy-MM-dd HH-mm")
+        val name = if (uri != null) File(uri!!).name else ""
+        val file = File(
+            getImageTasksPath(),
+            "Зображення " + sdf.format(Date(System.currentTimeMillis())) + " " + name + ".txt"
+        )
+        writeToFile(file, json.toString())
+    }
+
+    private fun createJson(): JSONObject {
+        val json = JSONObject()
         val jsonArray = JSONArray()
         for (point in points) {
             val jsonObject = JSONObject()
@@ -156,7 +199,54 @@ class CreatePictureTestFragment : Fragment() {
             jsonObject.put("radius", point.radius)
             jsonArray.put(jsonObject)
         }
-        val file = File(getImageTasksPath(), uri?.lastPathSegment ?: "no" + ".txt")
-        writeToFile(file, jsonArray.toString())
+        uri?.let {
+            json.put("path", it)
+        }
+        json.put("points", jsonArray)
+        return json
+    }
+
+    fun readPicture(file: File) {
+        val value = readFromFile(file)
+        if (!value.isNullOrEmpty()) {
+            restoreData(value)
+        }
+    }
+
+    private fun restoreData(value: String?) {
+        val json = JSONObject(value)
+        val path = json.getString("path")
+        val array = json.getJSONArray("points")
+        val points: MutableList<PointOnPicture> = ArrayList()
+        for (i in 0 until array.length()) {
+            val data = array.getJSONObject(i)
+            points.add(
+                PointOnPicture(
+                    data.getDouble("x").toFloat(),
+                    data.getDouble("y").toFloat(),
+                    data.getInt("radius"),
+                    data.getString("name")
+                )
+            )
+        }
+        this.points.clear()
+        this.points.addAll(points)
+        uri = path
+        restoreUi()
+    }
+
+    private fun restoreUi() {
+        val options = BitmapFactory.Options()
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888
+        val bitmap = BitmapFactory.decodeFile(uri, options)
+        imageView?.setImage(ImageSource.bitmap(bitmap))
+        val pointList: MutableList<PointF> = ArrayList()
+        for (point in points) {
+            if (point.x != null && point.y != null) {
+                pointList.add(PointF(point.x!!.toFloat(), point.y!!.toFloat()))
+            }
+        }
+        imageView?.setAndSavePins(pointList)
+        setResult()
     }
 }

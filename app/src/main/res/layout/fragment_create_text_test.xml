@@ -26,30 +26,55 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"  />
 
-        <EditText
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/question"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/tint"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            android:hint="Введіть питання"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/question_edit"
+                android:layout_width="match_parent"
+                android:background="@android:color/transparent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
 
         <CheckBox
             android:id="@+id/checkbox"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:gravity="center"
             app:layout_constraintBottom_toTopOf="@id/button_second"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/question" />
 
-        <EditText
-            android:textColor="@color/white"
+        <com.google.android.material.textfield.TextInputLayout
+            android:hint="Введіть варіант"
             android:id="@+id/editText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintBaseline_toBaselineOf="@id/checkbox"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/checkbox" />
+            app:layout_constraintTop_toBottomOf="@id/question"
+            app:layout_constraintStart_toEndOf="@id/checkbox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/variant_edit"
+                android:layout_width="match_parent"
+                android:background="@android:color/transparent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
 
         <Button
             android:id="@+id/button_second"
